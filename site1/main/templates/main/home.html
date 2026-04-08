@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang chủ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: var(--page-background, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+            min-height: 100vh;
+            color: white;
+        }
+        header {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            text-align: center;
+            padding: 2em;
+            position: relative;
+        }
+        header::before {
+            content: "🌟";
+            font-size: 3em;
+            position: absolute;
+            top: 10px;
+            left: 20px;
+        }
+        header::after {
+            content: "🌟";
+            font-size: 3em;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+        main {
+            padding: 3em;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 2em;
+            margin: 2em 0;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .btn {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        footer {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            text-align: center;
+            padding: 1em;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        .decoration {
+            font-size: 2em;
+            margin: 1em 0;
+        }
+        form {
+            margin: 1em 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5em;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 1em;
+        }
+        .info {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 8px;
+            padding: 0.8em;
+            margin: 1em 0;
+        }
+        .theme-btn {
+            background-color: #ffcc00;
+            color: #111;
+            margin-top: 1em;
+        }
+        .theme-btn:hover {
+            background-color: #e6b800;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background: rgba(255, 255, 255, 0.2);
+            margin: 0.5em 0;
+            padding: 0.5em;
+            border-radius: 5px;
+        }
+        body.dark {
+            background: #111;
+            color: #eee;
+        }
+        body.dark header {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+        body.dark .card {
+            background: rgba(0, 0, 0, 0.35);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+        body.dark .btn {
+            background-color: #ffbf00;
+            color: #111;
+        }
+        body.dark .btn:hover {
+            background-color: #e6ac00;
+        }
+        body.dark .info,
+        body.dark li {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.18);
+        }
+    </style>
+</head>
+<body style="--page-background: {{ page_background }};">
+    <header>
+        <h1>Hello Pro đến với trang của tôi</h1>
+        <button class="btn theme-btn" onclick="toggleTheme()">Đổi màu</button>
+    </header>
+    <main>
+        <div class="decoration">🎨✨🎭</div>
+        <div class="card">
+            <h2>Trang chủ</h2>
+            <p>Đây là trang chủ tôi.</p>
+            <form method="post">
+                {% csrf_token %}
+                <label for="name">Nhập tên của bạn:</label>
+                <input type="text" id="name" name="name" required>
+                <button type="submit" class="btn">Gửi</button>
+            </form>
+            {% if submitted_name %}
+                <p class="info">{{ greeting }} <strong>{{ submitted_name }}</strong></p>
+            {% endif %}
+            <p class="info">Tổng số tên đã nhập: <strong>{{ total_names }}</strong></p>
+            <h3>Danh sách tên đã nhập:</h3>
+            <ul id="name-list">
+                {% for name in names %}
+                    <li>{{ name.name }} ({{ name.created_at|date:"d/m/Y H:i" }})</li>
+                {% empty %}
+                    <li>Chưa có tên nào.</li>
+                {% endfor %}
+            </ul>
+            <button id="show-history" class="btn theme-btn" type="button" style="display:none;">Xem lịch sử</button>
+            <div id="history-sections" style="display:none; margin-top: 1em; text-align: left;">
+                <div style="margin-bottom: 1em;">
+                    <h4>Đã nhập</h4>
+                    <ul id="entered-list"></ul>
+                </div>
+                <div>
+                    <h4>Đã xóa</h4>
+                    <ul id="deleted-list"></ul>
+                </div>
+            </div>
+        </div>
+        <div class="decoration">🌈💫🌟</div>
+    </main>
+    <footer>
+        <!-- Footer trống -->
+    </footer>
+    <script>
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+        }
+
+        window.addEventListener('load', function() {
+            const nameList = document.getElementById('name-list');
+            const historyButton = document.getElementById('show-history');
+            const historySections = document.getElementById('history-sections');
+            const enteredList = document.getElementById('entered-list');
+            const deletedList = document.getElementById('deleted-list');
+
+            if (nameList && historyButton && enteredList && deletedList) {
+                const items = Array.from(nameList.querySelectorAll('li')).map(li => li.textContent.trim());
+                if (items.length > 0 && items[0] !== 'Chưa có tên nào.') {
+                    historyButton.style.display = 'inline-block';
+                    historyButton.addEventListener('click', function() {
+                        if (historySections.style.display === 'none') {
+                            historySections.style.display = 'block';
+                            enteredList.innerHTML = items.map(item => `<li>${item}</li>`).join('');
+                            deletedList.innerHTML = items.map(item => `<li>${item}</li>`).join('');
+                            historyButton.textContent = 'Ẩn lịch sử';
+                        } else {
+                            historySections.style.display = 'none';
+                            historyButton.textContent = 'Xem lịch sử';
+                        }
+                    });
+                    setTimeout(function() {
+                        nameList.innerHTML = '<li>Đã xóa lịch sử nhập.</li>';
+                    }, 1000);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
